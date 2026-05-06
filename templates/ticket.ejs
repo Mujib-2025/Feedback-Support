@@ -1,0 +1,45 @@
+<%- include('partials/header') %>
+<%- include('partials/nav') %>
+
+<h1>Ticket #<%= ticket.id %></h1>
+
+<p><b>Status:</b> <%= ticket.status %></p>
+<p><b>Customer:</b> <%= ticket.customer %></p>
+<p><b>Description:</b> <%= ticket.description %></p>
+<p>
+  <b>Luotu:</b> <%= new Date(ticket.created_at).toLocaleString() %>
+</p>
+<p>
+  <b>Käsitelty:</b> 
+  <%= ticket.handled ? new Date(ticket.handled).toLocaleString() : "ei viela käsitelty" %>
+</p>
+
+<h2>Messages</h2>
+
+<ul>
+  <% if (messages.length === 0) { %>
+    <li>No messages yet</li>
+  <% } %>
+
+<% messages.forEach(m => { %>
+  <li>
+    <b><%= m.sender %>:</b> <%= m.message %>
+    <br>
+    <small>
+      Lähetetty: <%= new Date(m.created_at).toLocaleString() %>
+    </small>
+  </li>
+<% }) %>
+</ul>
+
+<h2>Reply</h2>
+
+<form method="POST" action="/ticket/reply">
+  <input type="hidden" name="ticket_id" value="<%= ticket.id %>">
+
+  <textarea name="message" required></textarea><br><br>
+
+  <button type="submit">Vastaa</button>
+</form>
+
+<%- include('partials/footer') %>

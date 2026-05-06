@@ -1,0 +1,29 @@
+<%- include('partials/header') %>
+<%- include('partials/nav') %>
+
+<h1>Support Tickets</h1>
+
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Status</th>
+    <th>Customer</th>
+    <th>Description</th>
+    <th>Luotu</th>
+<th>Käsitelty</th>
+  </tr>
+
+  <% tickets.forEach(t => { %>
+    <tr>
+ <td><a href="/ticket?id=<%= t.id %>"><%= t.id %></a></td>
+      <td><%= t.status %></td>
+      <td><%= t.customer %></td>
+      <td><%= t.description %></td>
+      <td><%= new Date(t.created_at).toLocaleString() %></td>
+<td><%= t.handled ? new Date(t.handled).toLocaleString() : "-" %></td>
+    </tr>
+  <% }) %>
+
+</table>
+
+<%- include('partials/footer') %>

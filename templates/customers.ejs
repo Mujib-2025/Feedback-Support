@@ -1,0 +1,22 @@
+<%- include('partials/header') %>
+<%- include('partials/nav') %>
+
+<h1>Customers</h1>
+
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Email</th>
+  </tr>
+
+  <% customers.forEach(c => { %>
+    <tr>
+      <td><%= c.id %></td>
+      <td><%= c.full_name %></td>
+      <td><%= c.email %></td>
+    </tr>
+  <% }) %>
+</table>
+
+<%- include('partials/footer') %>
