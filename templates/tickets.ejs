@@ -1,29 +1,60 @@
-<%- include('partials/header') %>
-<%- include('partials/nav') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Support Tickets</title>
+  <style>
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    nav a { margin-right: 15px; text-decoration: none; color: #0066cc; }
+    nav a:hover { text-decoration: underline; }
+    nav { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/tickets">Tickets</a>
+    <a href="/customers">Customers</a>
+    <a href="/feedback">Feedback</a>
+  </nav>
 
-<h1>Support Tickets</h1>
-
-<table>
-  <tr>
-    <th>ID</th>
-    <th>Status</th>
-    <th>Customer</th>
-    <th>Description</th>
-    <th>Luotu</th>
-<th>Käsitelty</th>
-  </tr>
-
-  <% tickets.forEach(t => { %>
-    <tr>
- <td><a href="/ticket?id=<%= t.id %>"><%= t.id %></a></td>
-      <td><%= t.status %></td>
-      <td><%= t.customer %></td>
-      <td><%= t.description %></td>
-      <td><%= new Date(t.created_at).toLocaleString() %></td>
-<td><%= t.handled ? new Date(t.handled).toLocaleString() : "-" %></td>
-    </tr>
-  <% }) %>
-
-</table>
-
-<%- include('partials/footer') %>
+  <h1>Support Tickets</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Status</th>
+        <th>Customer</th>
+        <th>Description</th>
+        <th>Created</th>
+        <th>Handled</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% tickets.forEach(function(ticket) { %>
+        <tr>
+          <td><%= ticket.id %></td>
+          <td><%= ticket.status_description %></td>
+          <td><%= ticket.customer_name %></td>
+          <td><%= ticket.description %></td>
+          <td>
+            <%= ticket.arrived
+              ? new Date(ticket.arrived).toLocaleString('fi-FI')
+              : '-' %>
+          </td>
+          <td>
+            <%= ticket.handled
+              ? new Date(ticket.handled).toLocaleString('fi-FI')
+              : '-' %>
+          </td>
+          <td>
+            <a href="/ticket?id=<%= ticket.id %>">View</a>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</body>
+</html>

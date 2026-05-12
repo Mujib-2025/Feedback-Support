@@ -1,45 +1,63 @@
-<%- include('partials/header') %>
-<%- include('partials/nav') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ticket #<%= ticket.id %></title>
+  <style>
+    nav a { margin-right: 15px; text-decoration: none; color: #0066cc; }
+    nav a:hover { text-decoration: underline; }
+    nav { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/tickets">Tickets</a>
+    <a href="/customers">Customers</a>
+    <a href="/feedback">Feedback</a>
+  </nav>
 
-<h1>Ticket #<%= ticket.id %></h1>
+  <h1>Ticket #<%= ticket.id %></h1>
+  <p><strong>Description:</strong> <%= ticket.description %></p>
+  <p><strong>Customer:</strong> <%= ticket.customer_name %></p>
 
-<p><b>Status:</b> <%= ticket.status %></p>
-<p><b>Customer:</b> <%= ticket.customer %></p>
-<p><b>Description:</b> <%= ticket.description %></p>
-<p>
-  <b>Luotu:</b> <%= new Date(ticket.created_at).toLocaleString() %>
-</p>
-<p>
-  <b>Käsitelty:</b> 
-  <%= ticket.handled ? new Date(ticket.handled).toLocaleString() : "ei viela käsitelty" %>
-</p>
+  <form action="/ticket/status" method="POST">
+    <input type="hidden" name="ticket_id" value="<%= ticket.id %>">
+    <label for="status">Status:</label>
+    <select name="status" id="status">
+      <% statuses.forEach(function(s) { %>
+        <option value="<%= s.id %>"
+          <%= s.id == ticket.status ? 'selected' : '' %>
+        >
+          <%= s.description %>
+        </option>
+      <% }) %>
+    </select>
+    <button type="submit">Save Status</button>
+  </form>
 
-<h2>Messages</h2>
-
-<ul>
-  <% if (messages.length === 0) { %>
-    <li>No messages yet</li>
+  <h2>Messages</h2>
+  <% if (messages && messages.length) { %>
+    <ul>
+      <% messages.forEach(function(msg) { %>
+        <li>
+          <strong><%= msg.fullname %> (<%= msg.email %>):</strong>
+          <%= msg.body %>
+          <br><small><em>Sent at: <%= msg.created_at %></em></small>
+        </li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <p>No messages yet.</p>
   <% } %>
 
-<% messages.forEach(m => { %>
-  <li>
-    <b><%= m.sender %>:</b> <%= m.message %>
+  <h3>Reply</h3>
+  <form action="/ticket/reply" method="POST">
+    <input type="hidden" name="ticket_id" value="<%= ticket.id %>">
+    <textarea name="message" rows="4" cols="50" placeholder="Write a reply..."></textarea>
     <br>
-    <small>
-      Lähetetty: <%= new Date(m.created_at).toLocaleString() %>
-    </small>
-  </li>
-<% }) %>
-</ul>
+    <button type="submit">Send Reply</button>
+  </form>
 
-<h2>Reply</h2>
-
-<form method="POST" action="/ticket/reply">
-  <input type="hidden" name="ticket_id" value="<%= ticket.id %>">
-
-  <textarea name="message" required></textarea><br><br>
-
-  <button type="submit">Vastaa</button>
-</form>
-
-<%- include('partials/footer') %>
+  <p><a href="/tickets">← Back to all tickets</a></p>
+</body>
+</html>

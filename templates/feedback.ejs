@@ -1,5 +1,3 @@
-<%- include('partials/header') %>
-<%- include('partials/nav') %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,11 +5,19 @@
   <title>Feedback List</title>
   <style>
     table { border-collapse: collapse; width: 100%; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background: #f2f2f2; }
+    th, td { border: 1px solid #ccc; padding: 6px 10px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    nav a { margin-right: 15px; text-decoration: none; color: #0066cc; }
+    nav a:hover { text-decoration: underline; }
+    nav { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #ccc; }
   </style>
 </head>
 <body>
+  <nav>
+    <a href="/tickets">Tickets</a>
+    <a href="/customers">Customers</a>
+    <a href="/feedback">Feedback</a>
+  </nav>
   <h1>Feedback List</h1>
   <table>
     <thead>
@@ -26,19 +32,32 @@
       </tr>
     </thead>
     <tbody>
-      <% feedback.forEach(f => { %>
+      <% feedback.forEach(function(f) { %>
         <tr>
           <td><%= f.id %></td>
-          <td><%= f.arrived %></td>
-          <td><%= f.from_user || "-" %></td>
-          <td><%= f.guest_name || "-" %></td>
-          <td><%= f.guest_email || "-" %></td>
+          <td>
+            <%= f.arrived
+              ? new Date(f.arrived).toLocaleString('fi-FI')
+              : '-' %>
+          </td>
+          <td>
+            <% if (f.from_user) { %>
+              <%= f.user_fullname %>
+            <% } else { %>
+              -
+            <% } %>
+          </td>
+          <td><%= f.guest_name || '-' %></td>
+          <td><%= f.guest_email || '-' %></td>
           <td><%= f.feedback %></td>
-          <td><%= f.handled || "-" %></td>
+          <td>
+            <%= f.handled
+              ? new Date(f.handled).toLocaleString('fi-FI')
+              : '-' %>
+          </td>
         </tr>
       <% }) %>
     </tbody>
   </table>
 </body>
 </html>
-<%- include('partials/footer') %>

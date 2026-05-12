@@ -1,75 +1,99 @@
-import * as mariadb from "mariadb";
+import mysql from "mysql2/promise";
+import fs from "fs";
 
-const pool = mariadb.createPool({
-  host: "127.0.0.1",
-  port: 3307,
-  user: "root",
-  password: "ali99!xA",
-  database: "feedback_support",
-  connectionLimit: 5,
-
-  allowPublicKeyRetrieval: true,
-});
+const config = JSON.parse(fs.readFileSync("./dbconfig.json", "utf-8"));
+const pool = mysql.createPool(config);
 
 export async function getAllFeedback() {
-  let conn;
-
-  try {
-    conn = await pool.getConnection();
-
-    const rows = await conn.query("SELECT * FROM feedback");
-
-    return rows;
-  } catch (err) {
-    console.error("DB ERROR:", err);
-    throw err;
-  } finally {
-    if (conn) conn.release();
-  }
+  const [rows] = await pool.query(`
+    SELECT
+      f.*,
+      su.fullname AS user_fullname
+    FROM feedback f
+    LEFT JOIN system_user su ON f.from_user = su.id
+    ORDER BY f.arrived DESC
+  `);
+  return rows;
 }
-
 export async function getCustomers() {
-  const conn = await pool.getConnection();
-  const rows = await conn.query("SELECT * FROM customers");
-  conn.release();
+  const [rows] = await pool.query("SELECT * FROM customer");
   return rows;
 }
 
 export async function getTickets() {
-  const conn = await pool.getConnection();
-  const rows = await conn.query("SELECT * FROM tickets");
-  conn.release();
+  const [rows] = await pool.query(`
+    SELECT
+      st.*,
+      c.name AS customer_name,
+      ts.description AS status_description
+    FROM support_ticket st
+    JOIN customer c ON st.customer_id = c.id
+    JOIN ticket_status ts ON st.status = ts.id
+  `);
   return rows;
 }
 
 export async function getTicketById(id) {
-  const conn = await pool.getConnection();
-  const rows = await conn.query("SELECT * FROM tickets WHERE id = ?", [id]);
-  conn.release();
+  const [rows] = await pool.query(
+    `
+    SELECT
+      st.*,
+      c.name AS customer_name,
+      ts.description AS status_description
+    FROM support_ticket st
+    JOIN customer c ON st.customer_id = c.id
+    JOIN ticket_status ts ON st.status = ts.id
+    WHERE st.id = ?
+    `,
+    [id],
+  );
   return rows[0];
 }
 
 export async function getMessagesByTicketId(ticketId) {
-  const conn = await pool.getConnection();
-  const rows = await conn.query(
-    "SELECT * FROM messages WHERE ticket_id = ? ORDER BY created_at ASC",
+  const [rows] = await pool.query(
+    `
+    SELECT
+      sm.*,
+      su.fullname,
+      su.email
+    FROM support_message sm
+    JOIN system_user su ON sm.from_user = su.id
+    WHERE sm.ticket_id = ?
+    ORDER BY sm.created_at ASC
+    `,
     [ticketId],
   );
-  conn.release();
   return rows;
 }
 
 export async function addMessageToTicket(ticketId, message) {
-  const conn = await pool.getConnection();
+  const adminUserId = 14;
 
-  await conn.query(
-    "INSERT INTO messages (ticket_id, sender, message) VALUES (?, ?, ?)",
-    [ticketId, "admin", message],
+  await pool.query(
+    "INSERT INTO support_message (ticket_id, reply_to, from_user, body) VALUES (?, NULL, ?, ?)",
+    [ticketId, adminUserId, message],
   );
 
-  await conn.query("UPDATE tickets SET handled = NOW() WHERE id = ?", [
+  await pool.query("UPDATE support_ticket SET handled = NOW() WHERE id = ?", [
+    ticketId,
+  ]);
+}
+
+export async function getAllStatuses() {
+  const [rows] = await pool.query("SELECT * FROM ticket_status");
+  return rows;
+}
+
+export async function updateTicketStatus(ticketId, newStatus) {
+  await pool.query("UPDATE support_ticket SET status = ? WHERE id = ?", [
+    newStatus,
     ticketId,
   ]);
 
-  conn.release();
+  if (newStatus == 4) {
+    await pool.query("UPDATE support_ticket SET handled = NOW() WHERE id = ?", [
+      ticketId,
+    ]);
+  }
 }
