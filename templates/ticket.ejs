@@ -10,11 +10,7 @@
   </style>
 </head>
 <body>
-  <nav>
-    <a href="/tickets">Tickets</a>
-    <a href="/customers">Customers</a>
-    <a href="/feedback">Feedback</a>
-  </nav>
+  <%- include('partials/nav') %>
 
   <h1>Ticket #<%= ticket.id %></h1>
   <p><strong>Description:</strong> <%= ticket.description %></p>

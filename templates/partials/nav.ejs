@@ -1,5 +1,8 @@
 <nav style="background: #333; padding: 10px">
   <a href="/feedback" style="color: white; margin-right: 10px">Feedback</a>
   <a href="/customers" style="color: white; margin-right: 10px">Customers</a>
-  <a href="/tickets" style="color: white">Tickets</a>
+  <a href="/tickets" style="color: white; margin-right: 10px">Tickets</a>
+  <% if (user) { %>
+    <a href="/logout" style="color: white; margin-left: 20px;">Logout</a>
+  <% } %>
 </nav>

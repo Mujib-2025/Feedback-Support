@@ -97,3 +97,18 @@ export async function updateTicketStatus(ticketId, newStatus) {
     ]);
   }
 }
+
+export async function findUserByIdentifier(identifier) {
+  const isNumeric = !isNaN(Number(identifier));
+  let query;
+  let params;
+  if (isNumeric) {
+    query = `SELECT * FROM system_user WHERE id = ? AND admin = true`;
+    params = [Number(identifier)];
+  } else {
+    query = `SELECT * FROM system_user WHERE email = ? AND admin = true`;
+    params = [identifier];
+  }
+  const [rows] = await pool.query(query, params);
+  return rows[0] || null;
+}

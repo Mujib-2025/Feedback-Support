@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login - Feedback Support</title>
+</head>
+<body>
+  <h1>Login</h1>
+  <% if (error) { %>
+    <p style="color:red;">
+      <% if (error === 'missing_identifier') { %>
+        Please enter your ID or email.
+      <% } else if (error === 'invalid_credentials') { %>
+        Invalid credentials or you are not an admin.
+      <% } else { %>
+        An error occurred.
+      <% } %>
+    </p>
+  <% } %>
+  <form action="/login" method="post">
+    <label for="identifier">ID or email:</label>
+    <input type="text" name="identifier" id="identifier" required>
+    <button type="submit">Log in</button>
+  </form>
+</body>
+</html>
