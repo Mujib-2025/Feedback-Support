@@ -18,6 +18,7 @@ CREATE TABLE system_user (
     id INT AUTO_INCREMENT PRIMARY KEY,
     fullname VARCHAR(256),
     email VARCHAR(256) NOT NULL,
+    password VARCHAR(256) NOT NULL, 
     mailing_list BOOLEAN NOT NULL DEFAULT false,
     customer_id INT,
     admin BOOLEAN NOT NULL DEFAULT false
